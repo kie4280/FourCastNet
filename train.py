@@ -74,8 +74,7 @@ from collections import OrderedDict
 import pickle
 DECORRELATION_TIME = 36 # 9 days
 import json
-from ruamel.yaml import YAML
-from ruamel.yaml.comments import CommentedMap as ruamelDict
+import yaml
 
 class Trainer():
   def count_parameters(self):
@@ -604,8 +603,7 @@ if __name__ == '__main__':
   params['N_out_channels'] = len(params['out_channels'])
 
   if world_rank == 0:
-    hparams = ruamelDict()
-    yaml = YAML()
+    hparams = dict()
     for key, value in params.params.items():
       hparams[str(key)] = str(value)
     with open(os.path.join(expDir, 'hyperparams.yaml'), 'w') as hpfile:
