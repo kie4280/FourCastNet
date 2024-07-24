@@ -1,3 +1,8 @@
+# About
+
+This is a **clone** of the [FourCastNet](https://github.com/NVlabs/FourCastNet) repo,
+I'm merely adapting it for my own use. Please check out their repo if you have any questions. Thank you!!
+
 # FourCastNet
 
 ![nvidia](assets/nvidia.png) ![nersc](assets/nersc.png)
