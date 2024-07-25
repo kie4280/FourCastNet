@@ -43,10 +43,13 @@ def demo_basic():
   torch.manual_seed(123)
   dist.init_process_group(backend="gloo")
   rank = dist.get_rank()
+  
   print(f"Start running basic DDP example on rank {rank}.")
 
   # create model and move it to GPU with id rank
   model = ToyModel()
+  # sync the mean and variance across all mini-batches of the same process group
+  model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
   ddp_model = DDP(model)
 
   N, feat = 20000, 10
