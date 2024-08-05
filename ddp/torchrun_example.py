@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.distributed as dist
 import torch.nn as nn
@@ -38,10 +39,13 @@ class ToyDataset(torch.utils.data.Dataset):
     data, labels = zip(*batch)
     return torch.stack(data), torch.stack(labels)
 
+def setup_multinode_dist():
+  dist.init_process_group(backend="nccl")
 
 def demo_basic():
+  setup_multinode_dist()
   torch.manual_seed(123)
-  dist.init_process_group(backend="gloo")
+  device = torch.device("cuda:0")
   rank = dist.get_rank()
   
   print(f"Start running basic DDP example on rank {rank}.")
@@ -50,6 +54,7 @@ def demo_basic():
   model = ToyModel()
   # sync the mean and variance across all mini-batches of the same process group
   model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
+  model.to(device)
   ddp_model = DDP(model)
 
   N, feat = 20000, 10
@@ -72,6 +77,8 @@ def demo_basic():
   for epoch in range(epochs):
     for step, (sample_data, labels) in enumerate(
             tqdm(train_loader, disable=(rank != 0))):
+      sample_data = sample_data.to(device)
+      labels = labels.to(device)
       optimizer.zero_grad()
       outputs = ddp_model(sample_data)
       loss = loss_fn(outputs, labels)
