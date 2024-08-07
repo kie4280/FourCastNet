@@ -39,15 +39,20 @@ class ToyDataset(torch.utils.data.Dataset):
     data, labels = zip(*batch)
     return torch.stack(data), torch.stack(labels)
 
+
 def setup_multinode_dist():
+  master_addr = os.environ["MASTER_ADDR_OVERRIDE"]
+  if master_addr:
+    os.environ["MASTER_ADDR"] = master_addr
   dist.init_process_group(backend="nccl")
+
 
 def demo_basic():
   setup_multinode_dist()
   torch.manual_seed(123)
   device = torch.device("cuda:0")
   rank = dist.get_rank()
-  
+
   print(f"Start running basic DDP example on rank {rank}.")
 
   # create model and move it to GPU with id rank
@@ -57,7 +62,7 @@ def demo_basic():
   model.to(device)
   ddp_model = DDP(model)
 
-  N, feat = 20000, 10
+  N, feat = 200000, 10
   epochs = 5
 
   train_dataset = ToyDataset(N, feat)
