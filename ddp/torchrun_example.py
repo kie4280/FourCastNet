@@ -50,8 +50,8 @@ def setup_multinode_dist():
 def demo_basic():
   setup_multinode_dist()
   torch.manual_seed(123)
-  device = torch.device("cuda:0")
   rank = dist.get_rank()
+  device = torch.device(f"cuda:{rank}")
 
   print(f"Start running basic DDP example on rank {rank}.")
 
