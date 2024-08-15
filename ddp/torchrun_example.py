@@ -60,7 +60,7 @@ def demo_basic():
   # sync the mean and variance across all mini-batches of the same process group
   model = nn.SyncBatchNorm.convert_sync_batchnorm(model)
   model.to(device)
-  ddp_model = DDP(model)
+  ddp_model = DDP(model, device_ids=[rank], output_device=rank)
 
   N, feat = 200000, 10
   epochs = 5
